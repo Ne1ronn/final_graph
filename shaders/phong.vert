@@ -7,15 +7,18 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat3 normalMat;
+uniform mat4 lightSpace;
 
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 UV;
+out vec4 FragPosLight;
 
 void main() {
     vec4 world = model * vec4(aPos, 1.0);
     FragPos = world.xyz;
-    Normal  = normalMat * aNormal;
-    UV      = aUV;
+    Normal = normalMat * aNormal;
+    UV = aUV;
+    FragPosLight = lightSpace * world;
     gl_Position = projection * view * world;
 }
