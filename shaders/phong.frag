@@ -19,6 +19,8 @@ uniform float shininess;
 uniform float specStrength;
 
 uniform sampler2D shadowMap;
+uniform sampler2D grassTex;
+uniform sampler2D woodTex;
 uniform int shadowsOn;
 uniform vec3 skyTop;
 uniform vec3 skyHorizon;
@@ -67,13 +69,13 @@ void main() {
     vec3 albedo = color;
     if (matType == 1) {
         vec2 p = FragPos.xz;
-        float n = noise(p * 30.0) * 0.6 + noise(p * 7.0) * 0.4;
         float stripe = step(0.5, fract(p.y * 1.5)) * 0.12;
-        albedo = mix(vec3(0.10, 0.45, 0.12), vec3(0.25, 0.65, 0.20), n) - stripe;
+        albedo = texture(grassTex, UV * vec2(3.6, 7.2)).rgb - stripe;
     }
     if (matType == 4) {
-        float g = noise(vec2((FragPos.x + FragPos.z) * 2.0, FragPos.y * 40.0));
-        albedo = color * (0.7 + 0.5 * g);
+        vec3 n = abs(normalize(Normal));
+        vec2 uv = (n.y > 0.5) ? FragPos.xz : vec2(FragPos.x + FragPos.z, FragPos.y);
+        albedo = texture(woodTex, uv * 1.5).rgb;
     }
 
     vec3 N = normalize(Normal);

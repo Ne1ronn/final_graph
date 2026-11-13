@@ -14,6 +14,7 @@
 #include "Physics.h"
 #include "Shadow.h"
 #include "Particles.h"
+#include "Texture.h"
 
 struct App {
     Camera cam;
@@ -58,6 +59,7 @@ static void run(GLFWwindow* win) {
     Shader depthSh(dir + "depth.vert", dir + "depth.frag");
     Mesh cube = Mesh::cube(), plane = Mesh::plane(), sphere = Mesh::sphere(), cyl = Mesh::cylinder();
     ShadowMap shadow(2048);
+    Texture grassTex(Texture::GRASS), woodTex(Texture::WOOD);
     Confetti confetti;
 
     IMGUI_CHECKVERSION();
@@ -136,6 +138,14 @@ static void run(GLFWwindow* win) {
         bool still = !ball.moving() && ball.sink < 0.f;
         if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS) aim -= 1.5f * dt;
         if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS) aim += 1.5f * dt;
+
+        if (glfwGetKey(win, GLFW_KEY_LEFT)  == GLFW_PRESS) app.cam.yaw   -= 90.f * dt;
+        if (glfwGetKey(win, GLFW_KEY_RIGHT) == GLFW_PRESS) app.cam.yaw   += 90.f * dt;
+        if (glfwGetKey(win, GLFW_KEY_UP)    == GLFW_PRESS) app.cam.pitch  = std::min(85.f, app.cam.pitch + 60.f * dt);
+        if (glfwGetKey(win, GLFW_KEY_DOWN)  == GLFW_PRESS) app.cam.pitch  = std::max(10.f, app.cam.pitch - 60.f * dt);
+        if (glfwGetKey(win, GLFW_KEY_Q) == GLFW_PRESS) app.cam.dist = std::min(25.f, app.cam.dist + 6.f * dt);
+        if (glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS) app.cam.dist = std::max(3.f,  app.cam.dist - 6.f * dt);
+
         bool space = glfwGetKey(win, GLFW_KEY_SPACE) == GLFW_PRESS;
         if (still) {
             if (space) power = std::min(1.f, power + 0.8f * dt);
@@ -250,6 +260,10 @@ static void run(GLFWwindow* win) {
         sh.setVec3("skyTop", skyTop);   sh.setVec3("skyHorizon", skyHor);
         sh.setInt("shadowsOn", app.shadows ? 1 : 0);
         sh.setInt("shadowMap", 0);
+        sh.setInt("grassTex", 1);
+        sh.setInt("woodTex", 2);
+        grassTex.bind(1);
+        woodTex.bind(2);
         shadow.bind(0);
 
         glDepthMask(GL_FALSE);
@@ -269,7 +283,7 @@ static void run(GLFWwindow* win) {
         ImGui::Checkbox("Shadows (T)", &app.shadows);
         ImGui::Checkbox("Trajectory preview (P)", &app.preview);
         ImGui::Separator();
-        ImGui::TextUnformatted("A/D: aim\nSPACE: hold and release to shoot\nRMB drag: orbit camera\nMouse wheel: zoom\nR: restart hole\nEnter: next hole");
+        ImGui::TextUnformatted("A/D: aim\nSPACE: hold and release to shoot\nArrows: orbit camera\nQ/E: zoom\nRMB drag: orbit camera\nMouse wheel: zoom\nR: restart hole\nEnter: next hole");
         ImGui::End();
 
         if (holeDone) {
