@@ -5,11 +5,9 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# GLFW and GLM: installed with Homebrew, same as in the course assignments
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
-# Dear ImGui: bundled in the repository (third_party/imgui)
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/third_party/imgui)
 add_library(imgui_lib STATIC
   ${IMGUI_DIR}/imgui.cpp
